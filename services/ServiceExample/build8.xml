@@ -1,0 +1,187 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="ServiceExample8" default="all" basedir=".">
+    <property environment="env"/>
+
+    <property name="JAVA8_HOME_BIN" value="${env.JAVA8_HOME}/bin"/>
+
+    <macrodef name="javac8">
+        <attribute name="srcdir"/>
+        <attribute name="destdir"/>
+        
+        <sequential>
+            <local name="java.srcfiles"/>
+            <fileset id="srcfiles" dir="@{srcdir}" includes="**/*.java"/>
+            <pathconvert refid="srcfiles" pathsep=" " property="java.srcfiles"/>
+            
+            <mkdir dir="@{destdir}"/>
+
+            <exec executable="${JAVA8_HOME_BIN}/javac">
+                <arg line="-d @{destdir}"/>
+                <arg line="-modulepath @{destdir}"/>
+                <arg line="${java.srcfiles}"/>
+            </exec>
+        </sequential>
+    </macrodef>
+
+    <macrodef name="javac8lib">
+        <attribute name="lib"/>
+        <attribute name="srcdir"/>
+        <attribute name="destdir"/>
+
+        <sequential>
+            <local name="java.srcfiles"/>
+            <fileset id="srcfiles" dir="@{srcdir}" includes="**/*.java"/>
+            <pathconvert refid="srcfiles" pathsep=" " property="java.srcfiles"/>
+
+            <mkdir dir="@{destdir}"/>
+
+            <exec executable="${JAVA8_HOME_BIN}/javac">
+                <arg line="-L @{lib}"/>
+                <arg line="-d @{destdir}"/>
+                <arg line="-modulepath @{destdir}"/>
+                <arg line="${java.srcfiles}"/>
+            </exec>
+        </sequential>
+    </macrodef>
+    
+    <macrodef name="jmod-create">
+        <attribute name="destfile"/>
+        
+        <sequential>
+            <exec executable="${JAVA8_HOME_BIN}/jmod">
+                <arg line="-L @{destfile}"/>
+                <arg value="create"/>
+            </exec>
+        </sequential>
+    </macrodef>
+
+    <macrodef name="jrepo-create">
+        <attribute name="destfile"/>
+        
+        <sequential>
+            <exec executable="${JAVA8_HOME_BIN}/jrepo">
+                <arg value="@{destfile}"/>
+                <arg value="create"/>
+            </exec>
+        </sequential>
+    </macrodef>
+
+    <macrodef name="jrepo-add">
+        <attribute name="repo"/>
+        <attribute name="srcfile"/>
+        
+        <sequential>
+            <exec executable="${JAVA8_HOME_BIN}/jrepo">
+                <arg value="@{repo}"/>
+                <arg value="add"/>
+                <arg line="@{srcfile}"/>
+            </exec>
+        </sequential>
+    </macrodef>
+
+    <macrodef name="jpkg">
+        <attribute name="srcdir"/>
+        <attribute name="destfile"/>
+        
+        <sequential>
+            <exec executable="${JAVA8_HOME_BIN}/jpkg">
+                <arg line="-m @{srcdir}"/>
+                <arg value="jmod"/>
+                <arg line="@{destfile}"/>
+            </exec>
+        </sequential>
+    </macrodef>
+
+    <macrodef name="jmod-add-repo">
+        <attribute name="lib"/>
+        <attribute name="repo"/>
+        
+        <sequential>
+            <exec executable="${JAVA8_HOME_BIN}/jmod">
+                <arg line="-L @{lib}"/>
+                <arg value="add-repo"/>
+                <arg value="@{repo}"/>
+            </exec>
+        </sequential>
+    </macrodef>
+
+    <macrodef name="jmod-install-mclasses">
+        <attribute name="lib"/>
+        <attribute name="srcdir"/>
+        <attribute name="modules"/>
+        
+        <sequential>
+            <exec executable="${JAVA8_HOME_BIN}/jmod">
+                <arg line="-L @{lib}"/>
+                <arg value="install"/>
+                <arg value="@{srcdir}"/>
+                <arg line="@{modules}"/>                
+            </exec>
+        </sequential>
+    </macrodef>
+
+    <macrodef name="jmod-install-pkg">
+        <attribute name="lib"/>
+        <attribute name="srcfile"/>
+        
+        <sequential>
+            <exec executable="${JAVA8_HOME_BIN}/jmod">
+                <arg line="-L @{lib}"/>
+                <arg value="install"/>
+                <arg line="@{srcfile}"/>
+            </exec>
+        </sequential>
+    </macrodef>
+
+    <macrodef name="java8">
+        <attribute name="lib"/>
+        <attribute name="module"/>
+        
+        <sequential>            
+            <exec executable="${JAVA8_HOME_BIN}/java">
+                <arg line="-L @{lib}"/>
+                <arg line="-m @{module}"/>                
+            </exec>
+        </sequential>
+    </macrodef>
+
+    <macrodef name="java8debug">
+        <attribute name="lib"/>
+        <attribute name="module"/>
+        
+        <sequential>            
+            <exec executable="${JAVA8_HOME_BIN}/java">
+                <arg line="-Xrunjdwp:transport=dt_socket,server=y,address=8000"/>
+                <arg line="-L @{lib}"/>
+                <arg line="-m @{module}"/>                
+            </exec>
+        </sequential>
+    </macrodef>
+
+    <target name="clean">
+        <delete dir="build"/>        
+    </target>
+    
+    <target name="all" depends="clean">
+        <javac8 srcdir="src" destdir="build/mclasses"/>
+                
+        <jmod-create destfile="build/mlib"/>
+        
+        <jmod-install-mclasses lib="build/mlib" 
+        srcdir="build/mclasses" modules="mstringer mhasher mrotter mapp"/>
+        
+        <java8 lib="build/mlib" module="mapp"/>        
+    </target>
+
+    <target name="all-debug" depends="clean">
+        <javac8 srcdir="src" destdir="build/mclasses"/>
+                
+        <jmod-create destfile="build/mlib"/>
+        
+        <jmod-install-mclasses lib="build/mlib" 
+        srcdir="build/mclasses" modules="mstringer mhasher mrotter mapp"/>
+        
+        <java8debug lib="build/mlib" module="mapp"/>        
+    </target>
+
+</project>

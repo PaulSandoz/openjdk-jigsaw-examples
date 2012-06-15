@@ -1,4 +1,4 @@
-This is a simple consists of four modules.
+This is a simple example consists of four modules.
 
 The service interface module, mstringer, that exports (the package containing) a
 service interface, StringTransformer, for transforming strings.
@@ -6,7 +6,7 @@ service interface, StringTransformer, for transforming strings.
 The service consumer module, mapp, that is the application module and consumes
 service instances that are instances of StringTransformer.
 
-Teo service provider modules, mhasher and mrotter, that provide implementations
+Two service provider modules, mhasher and mrotter, that provide implementations
 of StringTransform that are declared as service provider classes.
 
 The module mapp will create the service instances for StringTransformer 
@@ -17,4 +17,6 @@ the build of OpenJDK Jigsaw and then execute:
 
   ant -f build8.xml all
 
-This example can be loaded and edited in NetBeans.
+This example can be loaded and edited in NetBeans, although NetBeans will
+of course no nothing about modules, so expect to see some red squiggly lines
+in the editor.

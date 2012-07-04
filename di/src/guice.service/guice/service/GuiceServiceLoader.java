@@ -12,6 +12,7 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.ServiceLoader;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class GuiceServiceLoader<T> implements Iterable<T> {
 
@@ -32,12 +33,25 @@ public class GuiceServiceLoader<T> implements Iterable<T> {
         return new LinkedHashSet<>(Initializer.injectors);
     }
 
-    private final Map<Injector, List<Key<T>>> injectorsAndKeys;
+    private static ConcurrentHashMap<Key, Map> cache = new ConcurrentHashMap<>();
 
-    private GuiceServiceLoader(Class<T> s) {
-        final Key<T> k = Key.get(s);
-        // ## this can be cached for each key
-        this.injectorsAndKeys = new LinkedHashMap<>();
+    @SuppressWarnings("unchecked")
+    private static <T> Map<Injector, List<Key<T>>> getInjectorsAndKeys(Key<T> k) {
+        Map v = cache.get(k);
+        if (v == null) {
+            v = createInjectorsAndKeys(k);
+
+            Map _v = cache.putIfAbsent(k, v);
+            if (_v != null) {
+                v = _v;
+            }
+        }
+        // Values will always be of Map<Injector, List<Key<T>>>
+        return (Map<Injector, List<Key<T>>>) v;
+    }
+
+    private static <T> Map<Injector, List<Key<T>>> createInjectorsAndKeys(Key<T> k) {
+        Map<Injector, List<Key<T>>> injectorsAndKeys = new LinkedHashMap<>();
         for (Injector i : getInjectors()) {
             for (Binding<T> b : i.findBindingsByType(k.getTypeLiteral())) {
                 List<Key<T>> l = injectorsAndKeys.get(i);
@@ -48,6 +62,13 @@ public class GuiceServiceLoader<T> implements Iterable<T> {
                 l.add(b.getKey());
             }
         }
+        return injectorsAndKeys;
+    }
+
+    private final Map<Injector, List<Key<T>>> injectorsAndKeys;
+
+    private GuiceServiceLoader(Class<T> s) {
+        this.injectorsAndKeys = getInjectorsAndKeys(Key.get(s));
     }
 
     @Override
@@ -64,7 +85,7 @@ public class GuiceServiceLoader<T> implements Iterable<T> {
             public boolean hasNext() {
                 if (keys == null || !keys.hasNext()) {
                     if (i.hasNext()) {
-                        Map.Entry<Injector, List<Key<T>>> e = i.next();
+                        final Map.Entry<Injector, List<Key<T>>> e = i.next();
                         injector = e.getKey();
                         keys = e.getValue().iterator();
                         return true;

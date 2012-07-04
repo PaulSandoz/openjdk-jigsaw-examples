@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="openjdk-jigsaw-guice" default="all" xmlns:artifact="antlib:org.apache.maven.artifact.ant">
+    <import file="../java8.xml"/>
+    
+    <path id="maven-ant-tasks.classpath" path="../lib/maven-ant-tasks-2.1.3.jar" />
+    <typedef resource="org/apache/maven/artifact/ant/antlib.xml"
+             uri="antlib:org.apache.maven.artifact.ant"
+             classpathref="maven-ant-tasks.classpath" />
+
+    <target name="dependencies">
+        <artifact:dependencies filesetId="guice.dependency.jars" useScope="runtime">
+            <dependency groupId="com.google.inject.extensions" artifactId="guice-multibindings" version="3.0"/>
+        </artifact:dependencies>
+
+        <copy todir="build/jars">
+            <fileset refid="guice.dependency.jars" />
+            <mapper type="flatten" />
+        </copy>
+    </target>
+
+    <target name="compile-modules">
+        <javac8 srcdir="msrc" destdir="build/mclasses"/>
+    </target>
+    
+    <target name="package" depends="compile-modules, dependencies">
+        <delete dir="build/mjars/"/>
+        
+        <copy todir="build/mjars">
+            <fileset dir="build/jars"/>
+        </copy>
+        
+        <jar-modularize src="build/mjars/aopalliance-1.0.jar" 
+                        module="build/mclasses/aopalliance"/>
+            
+        <jar-modularize src="build/mjars/javax.inject-1.jar" 
+                        module="build/mclasses/javax.inject"/>
+        
+        <jar-modularize src="build/mjars/guice-3.0.jar" 
+                        module="build/mclasses/guice"/>
+        
+        <jar-modularize src="build/mjars/guice-multibindings-3.0.jar" 
+                        module="build/mclasses/guice.multibindings"/>
+    </target>
+    
+    <target name="install" depends="package">
+        <jmod-create destfile="build/mlib"/>
+        
+        <jmod-install-pkg lib="build/mlib" srcfile="build/mjars/aopalliance-1.0.jar"/>
+        <jmod-install-pkg lib="build/mlib" srcfile="build/mjars/javax.inject-1.jar"/>
+        <jmod-install-pkg lib="build/mlib" srcfile="build/mjars/guice-3.0.jar"/>
+        <jmod-install-pkg lib="build/mlib" srcfile="build/mjars/guice-multibindings-3.0.jar"/>
+        
+    </target>    
+</project>

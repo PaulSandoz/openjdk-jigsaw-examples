@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="openjdk-jigsaw-di" default="all" xmlns:artifact="antlib:org.apache.maven.artifact.ant">
+    <import file="java8.xml"/>
+    
+    <target name="-check-guice-install" unless="guice.library.exists">
+        <available property="guice.library.exists" file="guice/build/mlib"/>
+    </target>
+    
+    <target name="guice-install" depends="-check-guice-install" unless="${guice.library.exists}">
+        <ant dir="guice" antfile="build8.xml" target="install"/>
+    </target>
+    
+    <target name="compile" depends="guice-install">
+        <javac8lib lib="guice/build/mlib" srcdir="src" destdir="build/mclasses"/>        
+    </target>
+    
+    <target name="install" depends="compile">
+        <delete dir="build/mlib"/>
+        <jmod-create-parent parent="guice/build/mlib" destfile="build/mlib"/>
+
+        <jmod-install-mclasses lib="build/mlib" srcdir="build/mclasses" 
+                               modules="guice.service stringer hasher rotter mapp"/>
+    </target>
+
+    <target name="run" depends="install">
+        <java8 lib="build/mlib" module="mapp"/>   
+    </target>
+
+</project>

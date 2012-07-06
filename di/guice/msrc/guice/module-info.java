@@ -13,6 +13,7 @@ module guice@3.0 {
     view guice.internal {
         permits guice.multibindings;
 
+        exports com.google.inject.internal;
         exports com.google.inject.internal.util;
     }
 }

@@ -121,4 +121,16 @@
         </sequential>
     </macrodef>
 
+    <macrodef name="java8debug">
+        <attribute name="lib"/>
+        <attribute name="module"/>
+        
+        <sequential>            
+            <exec executable="${JAVA8_HOME_BIN}/java">
+                <arg line="-Xrunjdwp:transport=dt_socket,server=y,address=8000"/>
+                <arg line="-L @{lib}"/>
+                <arg line="-m @{module}"/>                
+            </exec>
+        </sequential>
+    </macrodef>
 </project>

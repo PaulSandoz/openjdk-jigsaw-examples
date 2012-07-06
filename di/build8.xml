@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project name="openjdk-jigsaw-di" default="all" xmlns:artifact="antlib:org.apache.maven.artifact.ant">
+<project name="openjdk-jigsaw-di" default="run" xmlns:artifact="antlib:org.apache.maven.artifact.ant">
     <import file="java8.xml"/>
     
     <target name="-check-guice-install" unless="guice.library.exists">
@@ -26,4 +26,7 @@
         <java8 lib="build/mlib" module="mapp"/>   
     </target>
 
+    <target name="debug" depends="install">
+        <java8debug lib="build/mlib" module="mapp"/>   
+    </target>
 </project>

@@ -11,7 +11,7 @@ public class RotterStringTransformer implements StringTransformer {
 
     @Override
     public String transform(String s) {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
 
         for (char c : s.toCharArray()) {
             sb.append(transform(c));

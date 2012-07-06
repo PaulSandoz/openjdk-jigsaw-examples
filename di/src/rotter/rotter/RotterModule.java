@@ -9,7 +9,9 @@ public class RotterModule extends AbstractModule {
 
     @Override
     protected void configure() {
-        Multibinder<StringTransformer> uriBinder = Multibinder.newSetBinder(binder(), StringTransformer.class);
-        uriBinder.addBinding().to(RotterStringTransformer.class).in(Scopes.SINGLETON);
+        Multibinder<StringTransformer> uriBinder = Multibinder.
+                newSetBinder(binder(), StringTransformer.class);
+        uriBinder.addBinding().to(RotterStringTransformer.class).
+                in(Scopes.SINGLETON);
     }
 }

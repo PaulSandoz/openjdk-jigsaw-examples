@@ -22,7 +22,8 @@ public class GuiceServiceLoader<T> implements Iterable<T> {
 
         private static Set<Injector> load() {
             final Set<Injector> giss = new LinkedHashSet<>();
-            for (GuiceInjectorService g : ServiceLoader.load(GuiceInjectorService.class)) {
+            for (GuiceInjectorService g : ServiceLoader.
+                    load(GuiceInjectorService.class)) {
                 giss.add(g.getInjector());
             }
             return giss;
@@ -73,7 +74,8 @@ public class GuiceServiceLoader<T> implements Iterable<T> {
 
     @Override
     public Iterator<T> iterator() {
-        final Iterator<Map.Entry<Injector, List<Key<T>>>> i = injectorsAndKeys.entrySet().iterator();
+        final Iterator<Map.Entry<Injector, List<Key<T>>>> i = 
+                injectorsAndKeys.entrySet().iterator();
 
         return new Iterator<T>() {
 

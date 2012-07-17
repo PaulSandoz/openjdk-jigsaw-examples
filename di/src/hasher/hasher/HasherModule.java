@@ -18,7 +18,7 @@ public class HasherModule extends AbstractModule {
     @Provides
     @Named("ToLowerCaseHasher")
     @Singleton
-    protected StringTransformer x(final StringTransformer st) {
+    protected StringTransformer toLowerCase(final StringTransformer st) {
         return new StringTransformer() {
 
             @Override
@@ -28,7 +28,7 @@ public class HasherModule extends AbstractModule {
 
             @Override
             public String transform(String s) {
-                return transform(s).toLowerCase();
+                return st.transform(s).toLowerCase();
             }
         };
     }

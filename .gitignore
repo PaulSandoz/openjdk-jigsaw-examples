@@ -1,4 +1,6 @@
 /services/ServiceExample/build/
 /di/build/
 /di/guice/build/
+/di/nbproject/private/
+/basic/build/
 /basic/nbproject/private/

@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="basic" default="all-mclasses" basedir=".">
+    <import file="java8.xml"/>
+
+    <target name="clean">
+        <delete dir="build"/>        
+    </target>
+    
+    <target name="all-mclasses" depends="clean">
+        <javac8 srcdir="src" destdir="build/mclasses"/>
+                
+        <jmod-create destfile="build/mlib"/>
+        
+        <jmod-install-mclasses lib="build/mlib" 
+        srcdir="build/mclasses" modules="mbar mfoo"/>
+        
+        <java8 lib="build/mlib" module="mfoo"/>        
+        <java8 lib="build/mlib" module="mbar"/>
+    </target>
+    
+    <target name="all-pkgs" depends="clean">
+        <javac8 srcdir="src" destdir="build/mclasses"/>
+        
+        <mkdir dir="build/modules"/>
+        <jpkg srcdir="build/mclasses/mfoo" destfile="build/modules/mfoo"/>
+        <jpkg srcdir="build/mclasses/mbar" destfile="build/modules/mbar"/>
+        
+        <jmod-create destfile="build/mlib"/>        
+        <jmod-install-pkg lib="build/mlib" 
+        srcfile="build/modules/mbar@1.0.jmod build/modules/mfoo@1.0.jmod"/>
+        
+        <java8 lib="build/mlib" module="mfoo"/>        
+        <java8 lib="build/mlib" module="mbar"/>
+    </target>
+
+    <target name="all-jars" depends="clean">
+        <javac8 srcdir="src" destdir="build/mclasses"/>
+        
+        <mkdir dir="build/modules"/>
+        <jar basedir="build/mclasses/mfoo" destfile="build/modules/mfoo@1.0.jar"/>
+        <jar basedir="build/mclasses/mbar" destfile="build/modules/mbar@1.0.jar"/>
+        
+        <jmod-create destfile="build/mlib"/>        
+        <jmod-install-pkg lib="build/mlib" 
+        srcfile="build/modules/mbar@1.0.jar build/modules/mfoo@1.0.jar"/>
+        
+        <java8 lib="build/mlib" module="mfoo"/>        
+        <java8 lib="build/mlib" module="mbar"/>
+    </target>
+
+    <target name="all-pkgs-repo" depends="clean">
+        <javac8 srcdir="src" destdir="build/mclasses"/>
+        
+        <mkdir dir="build/modules"/>
+        <jpkg srcdir="build/mclasses/mfoo" destfile="build/modules/mfoo"/>
+        <jpkg srcdir="build/mclasses/mbar" destfile="build/modules/mbar"/>
+        
+        <jrepo-create destfile="build/mrepo"/>
+        <jrepo-add repo="build/mrepo" srcfile="build/modules/mbar@1.0.jmod"/>
+        <jrepo-add repo="build/mrepo" srcfile="build/modules/mfoo@1.0.jmod"/>
+
+        <jmod-create destfile="build/mlib"/>
+        <jmod-add-repo lib="build/mlib" repo="file:${basedir}/build/mrepo"/>
+        
+        <jmod-install-pkg lib="build/mlib" srcfile="mbar@&lt;2.0"/>
+        
+        <java8 lib="build/mlib" module="mfoo"/>        
+        <java8 lib="build/mlib" module="mbar"/>
+    </target>
+
+    <target name="all-jars-repo" depends="clean">
+        <javac8 srcdir="src" destdir="build/mclasses"/>
+        
+        <mkdir dir="build/modules"/>
+        <jar basedir="build/mclasses/mfoo" destfile="build/modules/mfoo@1.0.jar"/>
+        <jar basedir="build/mclasses/mbar" destfile="build/modules/mbar@1.0.jar"/>
+        
+        <jrepo-create destfile="build/mrepo"/>
+        <jrepo-add repo="build/mrepo" srcfile="build/modules/mbar@1.0.jar"/>
+        <jrepo-add repo="build/mrepo" srcfile="build/modules/mfoo@1.0.jar"/>
+
+        <jmod-create destfile="build/mlib"/>
+        <jmod-add-repo lib="build/mlib" repo="file:${basedir}/build/mrepo"/>
+        
+        <jmod-install-pkg lib="build/mlib" srcfile="mbar@&lt;2.0"/>
+        
+        <java8 lib="build/mlib" module="mfoo"/>        
+        <java8 lib="build/mlib" module="mbar"/>
+    </target>
+</project>

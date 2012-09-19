@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="openjdk-jigsaw-java8">
+    <property environment="env"/>
+
+    <property name="JAVA8_HOME_BIN" value="${env.JAVA8_HOME}/bin"/>
+
+    <macrodef name="javac8">
+        <attribute name="srcdir"/>
+        <attribute name="destdir"/>
+        
+        <sequential>
+            <local name="java.srcfiles"/>
+            <fileset id="srcfiles" dir="@{srcdir}" includes="**/*.java"/>
+            <pathconvert refid="srcfiles" pathsep=" " property="java.srcfiles"/>
+            
+            <mkdir dir="@{destdir}"/>
+
+            <exec executable="${JAVA8_HOME_BIN}/javac">
+                <arg line="-d @{destdir}"/>
+                <arg line="-modulepath @{destdir}"/>
+                <arg line="${java.srcfiles}"/>
+            </exec>
+        </sequential>
+    </macrodef>
+
+    <macrodef name="javac8lib">
+        <attribute name="lib"/>
+        <attribute name="srcdir"/>
+        <attribute name="destdir"/>
+
+        <sequential>
+            <local name="java.srcfiles"/>
+            <fileset id="srcfiles" dir="@{srcdir}" includes="**/*.java"/>
+            <pathconvert refid="srcfiles" pathsep=" " property="java.srcfiles"/>
+
+            <mkdir dir="@{destdir}"/>
+
+            <exec executable="${JAVA8_HOME_BIN}/javac">
+                <arg line="-L @{lib}"/>
+                <arg line="-d @{destdir}"/>
+                <arg line="-modulepath @{destdir}"/>
+                <arg line="${java.srcfiles}"/>
+            </exec>
+        </sequential>
+    </macrodef>
+
+    <macrodef name="jar-modularize">
+        <attribute name="src"/>
+        <attribute name="module"/>
+
+        <sequential>
+            <exec executable="${JAVA8_HOME_BIN}/jar">
+                <arg line="uvf @{src}"/>
+                <arg line="-C @{module}"/>
+                <arg line="module-info.class"/>
+            </exec>
+        </sequential>
+    </macrodef>
+
+    <macrodef name="jmod-create">
+        <attribute name="destfile"/>
+        
+        <sequential>
+            <exec executable="${JAVA8_HOME_BIN}/jmod">
+                <arg line="-L @{destfile}"/>
+                <arg value="create"/>
+            </exec>
+        </sequential>
+    </macrodef>
+
+    <macrodef name="jmod-create-parent">
+        <attribute name="parent"/>
+        <attribute name="destfile"/>
+        
+        <sequential>
+            <exec executable="${JAVA8_HOME_BIN}/jmod">
+                <arg line="-L @{destfile}"/>
+                <arg line="-P @{parent}"/>
+                <arg value="create"/>
+            </exec>
+        </sequential>
+    </macrodef>
+
+    <macrodef name="jmod-install-pkg">
+        <attribute name="lib"/>
+        <attribute name="srcfile"/>
+        
+        <sequential>
+            <exec executable="${JAVA8_HOME_BIN}/jmod">
+                <arg line="-L @{lib}"/>
+                <arg value="install"/>
+                <arg line="@{srcfile}"/>
+            </exec>
+        </sequential>
+    </macrodef>
+    
+    <macrodef name="jmod-install-mclasses">
+        <attribute name="lib"/>
+        <attribute name="srcdir"/>
+        <attribute name="modules"/>
+        
+        <sequential>
+            <exec executable="${JAVA8_HOME_BIN}/jmod">
+                <arg line="-L @{lib}"/>
+                <arg value="install"/>
+                <arg value="@{srcdir}"/>
+                <arg line="@{modules}"/>                
+            </exec>
+        </sequential>
+    </macrodef>
+
+    <macrodef name="java8">
+        <attribute name="lib"/>
+        <attribute name="module"/>
+        
+        <sequential>            
+            <exec executable="${JAVA8_HOME_BIN}/java">
+                <arg line="-L @{lib}"/>
+                <arg line="-m @{module}"/>                
+            </exec>
+        </sequential>
+    </macrodef>
+
+    <macrodef name="java8debug">
+        <attribute name="lib"/>
+        <attribute name="module"/>
+        
+        <sequential>            
+            <exec executable="${JAVA8_HOME_BIN}/java">
+                <arg line="-Xrunjdwp:transport=dt_socket,server=y,address=8000"/>
+                <arg line="-L @{lib}"/>
+                <arg line="-m @{module}"/>                
+            </exec>
+        </sequential>
+    </macrodef>
+</project>
